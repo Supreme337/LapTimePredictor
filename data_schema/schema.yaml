@@ -1,0 +1,43 @@
+name: lap_time_prediction_schema
+version: 1.0
+
+target_column: LapTimeSeconds
+
+numerical_columns:
+  - Year
+  - Round
+  - TireAge
+  - LapPct
+  - StintLap
+  - grid
+
+
+categorical_columns:
+  - circuitId
+  - constructorId
+
+binary_columns:
+  - IsPitLap
+  - HasPitOut
+  - Compound_HARD
+  - Compound_MEDIUM
+  - Compound_SOFT
+  - Compound_INTERMEDIATE
+  - Compound_WET
+  - Compound_UNKNOWN
+
+drop_columns:
+  - Driver
+  - LapTime
+  - TrackName
+  - location
+  - country
+  - alt
+
+metadata:
+  problem_type: regression
+  description: >
+    Formula 1 tire strategy dataset used to predict lap time based on
+    tire age, compound, race progress, track characteristics, and team performance.
+  total_features: 15
+  target: LapTimeSeconds
