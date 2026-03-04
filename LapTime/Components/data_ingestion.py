@@ -4,10 +4,10 @@ import pandas as pd
 import numpy as np
 import pymongo
 from dotenv import load_dotenv
-from LapTime.logging.logger import logging
-from LapTime.exception.exception import LapTimeException
-from LapTime.entity.config_entity import DataIngestionConfig
-from LapTime.entity.artifact_entity import DataIngestionArtifact
+from laptime.logging.logger import logging
+from laptime.exception.exception import LapTimeException
+from laptime.entity.config_entity import DataIngestionConfig
+from laptime.entity.artifact_entity import DataIngestionArtifact
 from typing import List
 from sklearn.model_selection import train_test_split
 

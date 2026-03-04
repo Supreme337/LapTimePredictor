@@ -4,4 +4,4 @@ cache/
 venv/
 __pycache__/
 .env/
-
+F1_datasets/*.csv

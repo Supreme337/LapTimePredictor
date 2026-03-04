@@ -6,3 +6,5 @@ seaborn
 fastf1
 pymongo
 dotenv
+xgboost
+pyaml

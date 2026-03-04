@@ -2,12 +2,12 @@ import os
 import sys
 import pandas as pd
 import numpy as np
-from LapTime.entity.config_entity import DataValidationConfig
-from LapTime.entity.artifact_entity import DataIngestionArtifact,DataValidationArtifact
-from LapTime.exception.exception import LapTimeException   
-from LapTime.logging.logger import logging
-from LapTime.utils.main_utils.utils import read_yaml_file,write_yaml_file
-from LapTime.Constant.constants import SCHEMA_FILE_PATH
+from laptime.entity.config_entity import DataValidationConfig
+from laptime.entity.artifact_entity import DataIngestionArtifact,DataValidationArtifact
+from laptime.exception.exception import LapTimeException   
+from laptime.logging.logger import logging
+from laptime.utils.main_utils.utils import read_yaml_file,write_yaml_file
+from laptime.constant.constants import SCHEMA_FILE_PATH
 from scipy.stats import ks_2samp
 
 class DataValidation:

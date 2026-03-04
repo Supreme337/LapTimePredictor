@@ -8,7 +8,7 @@ import json
 MONGO_DB_URL=os.getenv("MONGO_DB_URL")
 DATABASE_NAME="F1"
 COLLECTION_NAME="LapTime"
-CSV_FILE_PATH="/Users/malik/Desktop/TireStrategy/dataset/processed_f1_tire_strategy_dataset.csv"
+CSV_FILE_PATH="/Users/malik/Desktop/LapTime/dataset/f1_tire_strategy_dataset.csv"
 
 client=pymongo.MongoClient(MONGO_DB_URL)
 db=client[DATABASE_NAME]

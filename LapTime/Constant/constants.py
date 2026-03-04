@@ -17,6 +17,11 @@ MODEL_FILE_NAME:str="model.pkl"
 PREPROCESSING_OBJECT_FILE_NAME:str="preprocessing.pkl"
 SAVED_MODEL_DIR:str="final_models"
 
+COLUMNS_TO_DROP=['lap','milliseconds','driverId_y','year','round','name_y','name_x','Driver','LapTime','location','alt'
+                 ,'TrackName','race_Id','RaceProgress','Compound_UNKNOWN']
+TIRE_TYPE_COLUMNS=['Compound_SOFT','Compound_MEDIUM','Compound_HARD','Compound_INTERMEDIATE','Compound_WET']
+NA_COLUMNS=[('TireAge','Stint')]
+
 """Data Ingestion Constants"""
 DATA_INGESTION_COLLECTION_NAME:str="LapTime"
 DATA_INGESTION_DATABASE_NAME:str="F1"
@@ -33,3 +38,10 @@ DATA_VALIDATION_DRIFT_REPORT_DIR:str="drift_report"
 DATA_VALIDATION_DRIFT_REPORT_FILE_NAME:str="report.yaml"
 PREPROCESSING_OBJECT_FILE_NAME:str="preprocessing.pkl" 
 
+"""Data Transformation Constants"""
+DATA_TRANSFORMATION_DIR:str="data_transformation"
+DATA_TRANSFORMATION_TRANSFORMED_DATA_DIR:str="transformed"
+DATA_TRANSFORMATION_TRANSFORMED_OBJECT_DIR:str="transformed_object"
+DATA_TRANSFORMATION_TRAIN_FILE_PATH:str='train.npy'
+DATA_TRANSFORMATION_TEST_FILE_PATH:str="test.npy"
+DATA_TRANSFORMATION_TRANSFORMED_OBJET_FILE_PATH:str="preprocessing.pkl"
