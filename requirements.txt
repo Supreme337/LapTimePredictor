@@ -8,3 +8,6 @@ pymongo
 dotenv
 xgboost
 pyaml
+tqdm
+mlflow
+dagshub

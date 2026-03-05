@@ -1,5 +1,5 @@
 import sys
-from laptime import logger
+from laptime.logging.logger import logging
 class LapTimeException(Exception):
     def __init__(self,error_message,error_details:sys):
         self.error_message=error_message

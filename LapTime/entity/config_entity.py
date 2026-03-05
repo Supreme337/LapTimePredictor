@@ -41,4 +41,10 @@ class DataTransformationConfig:
         self.transformed_train_file_path:str=os.path.join(self.transformed_data_dir,constants.DATA_TRANSFORMATION_TRAIN_FILE_PATH)
         self.transformed_test_file_path:str=os.path.join(self.transformed_data_dir,constants.DATA_TRANSFORMATION_TEST_FILE_PATH)
         self.transformed_object_file_path:str=os.path.join(self.transformed_data_dir,constants.DATA_TRANSFORMATION_TRANSFORMED_OBJET_FILE_PATH)
-        
+    
+class ModelTrainerConfig:
+    def __init__(self,training_pipeline_config:TrainingPipelineConfig):
+        self.model_trainer_dir:str=os.path.join(training_pipeline_config.artifact_dir,constants.MODEL_TRAINER_DIR_NAME)
+        self.trained_model_file_path:str=os.path.join(self.model_trainer_dir,constants.MODEL_TRAINER_TRAINED_MODEL_DIR,constants.MODEL_FILE_NAME)
+        self.expected_score:float=constants.MODEL_TRAINER_EXPECTED_SCORE
+        self.overfitting_threshold:float=constants.MODEL_TRAINER_OVERFITTING_THRESHOLD
