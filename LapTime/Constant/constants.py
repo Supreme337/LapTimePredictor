@@ -13,6 +13,8 @@ SCHEMA_FILE_PATH=os.path.join("data_schema","schema.yaml")
 TRAIN_FILE_NAME:str="train.csv"
 TEST_FILE_NAME:str="test.csv"
 
+TRAINING_BUCKET_NAME="laptime"
+
 MODEL_FILE_NAME:str="model.pkl"
 PREPROCESSING_OBJECT_FILE_NAME:str="preprocessing.pkl"
 SAVED_MODEL_DIR:str="final_models"
@@ -23,7 +25,7 @@ TIRE_TYPE_COLUMNS=['Compound_SOFT','Compound_MEDIUM','Compound_HARD','Compound_I
 NA_COLUMNS=[('TireAge','Stint')]
 
 """Data Ingestion Constants"""
-DATA_INGESTION_COLLECTION_NAME:str="LapTime"
+DATA_INGESTION_COLLECTION_NAME:str="dataset_metadata"
 DATA_INGESTION_DATABASE_NAME:str="F1"
 DATA_INGESTION_DIR_NAME:str="data_ingestion"
 DATA_INGESTION_FEATURE_STORE_DIR:str="feature_store"
