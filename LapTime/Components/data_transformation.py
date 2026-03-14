@@ -5,6 +5,7 @@ import numpy as np
 from typing import List
 from laptime.entity.config_entity import DataTransformationConfig
 from laptime.entity.artifact_entity import DataValidationArtifact,DataTransformationArtifact
+from laptime.entity.config_entity import ModelTrainerConfig
 from laptime.constant.constants import TARGET_COLUMN,COLUMNS_TO_DROP,TIRE_TYPE_COLUMNS,NA_COLUMNS
 from laptime.logging.logger import logging
 from laptime.exception.exception import LapTimeException
@@ -14,9 +15,10 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
 class DataTransformation:
-    def __init__(self,data_transformation_config:DataTransformationConfig,data_validation_artifact:DataValidationArtifact):
+    def __init__(self,data_transformation_config:DataTransformationConfig,data_validation_artifact:DataValidationArtifact,model_trainer_config:ModelTrainerConfig):
         self.data_transformation_config=data_transformation_config
         self.data_validation_artifact=data_validation_artifact
+        self.model_trainer_config=model_trainer_config
 
     @staticmethod
     def read_data(file_path:str)->pd.DataFrame:
@@ -57,14 +59,21 @@ class DataTransformation:
             x_train_transformed=preprocessor.fit_transform(x_train)
             x_test_transformed=preprocessor.transform(x_test)
 
+            final_model_path=os.path.join(self.model_trainer_config.model_trainer_dir,"final_model")
+            os.makedirs(final_model_path,exist_ok=True)
+
+            feature_names=preprocessor.get_feature_names_out()
+            save_object(os.path.join(final_model_path,"feature_names.pkl"),feature_names)
+            logging.info(f"Feature names saved at {os.path.join(final_model_path,'feature_names.pkl')}")
+
             save_numpy_array_data(file_path=self.data_transformation_config.transformed_train_file_path,array=train_df)
             save_numpy_array_data(file_path=self.data_transformation_config.transformed_test_file_path,array=test_df)
             save_object(file_path=self.data_transformation_config.transformed_object_file_path,obj=preprocessor)
 
-
             data_transformation_artifact=DataTransformationArtifact(transformed_train_file_path=self.data_transformation_config.transformed_train_file_path,
                                                                     transformed_test_file_path=self.data_transformation_config.transformed_test_file_path,
-                                                                    transformed_object_file_path=self.data_transformation_config.transformed_object_file_path)
+                                                                    transformed_object_file_path=self.data_transformation_config.transformed_object_file_path,
+                                                                    feature_names_file_path=os.path.join(final_model_path,"feature_names.pkl"))
             logging.info(f"Data transformation completed successfully, artifact: {data_transformation_artifact}")
             return data_transformation_artifact
         except Exception as e:

@@ -27,7 +27,7 @@ class ModelTrainerArtifact:
     test_score:float
 
 @dataclass
-class ClassificationMetricArtifact:
-    f1_score:float
-    precision_score:float
-    recall_score:float
+class RegressionMetricArtifact:
+    mean_absolute_error:float
+    mean_squared_error:float
+    r2_score:float

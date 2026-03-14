@@ -7,12 +7,12 @@ from urllib.parse import urlparse
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
-from xgboost import XGBRegressor
+from xgboost import XGBRegressor,plot_importance    
 from laptime.exception.exception import LapTimeException
 from laptime.constant.constants import TARGET_COLUMN
 from laptime.logging.logger import logging
-from sklearn.metrics import f1_score,precision_score,recall_score
-from laptime.utils.ml_utils import classification_metric
+from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score
+from laptime.utils.ml_utils.regression_metric import get_regression_score
 from laptime.entity.config_entity import ModelTrainerConfig
 from laptime.entity.artifact_entity import ModelTrainerArtifact,DataTransformationArtifact
 from laptime.utils.main_utils.utils import load_object,save_object
@@ -28,7 +28,7 @@ class ModelTrainer:
         except Exception as e:
             raise LapTimeException(e,sys)
         
-    def train_model(self,x_train,y_train):
+    def train_model(self,x_train,y_train,x_test,y_test):
         model=XGBRegressor(
             n_estimators=1000,
             learning_rate=0.05,
@@ -38,18 +38,28 @@ class ModelTrainer:
             colsample_bytree=0.8,
             tree_method="hist",
             verbose=False)
-        model.fit(x_train,y_train,eval_set=[(x_train,y_train)])
+        model.fit(x_train,y_train,eval_set=[(x_test,y_test)])
+        plot_importance(model,max_num_features=20)
+        plt.savefig("xgb_importance.png")
         return model
+    
 
-    def log_mlflow(self,model,x_test,y_test,train_acc,test_acc):
+    def log_mlflow(self,model,train_metrics,test_metrics):
         with mlflow.start_run(run_name="XGBoost_Trainer"):
             mlflow.log_param("n_estimators",1000)
             mlflow.log_param("learning_rate",0.05)
             mlflow.log_param("max_depth",8)
             mlflow.log_param("sub_sample",0.8)
             mlflow.log_param("colsample_bytree",0.8)
-            mlflow.log_metric("train_f1_score",train_acc)
-            mlflow.log_metric("test_f1_score",test_acc)
+            mlflow.log_metric("train_mae",train_metrics["mae"])
+            mlflow.log_metric("train_mse",train_metrics["mse"])
+            mlflow.log_metric("train_r2_score",train_metrics["r2_score"])
+            mlflow.log_metric("train_rmse",train_metrics["rmse"])
+            mlflow.log_metric("test_mae",test_metrics["mae"])
+            mlflow.log_metric("test_mse",test_metrics["mse"])   
+            mlflow.log_metric("test_r2_score",test_metrics["r2_score"])
+            mlflow.log_metric("test_rmse",test_metrics["rmse"])
+            mlflow.log_artifact("xgb_importance.png")
 
             tracking_uri=mlflow.get_tracking_uri()
             tracking_scheme=urlparse(tracking_uri).scheme
@@ -84,14 +94,14 @@ class ModelTrainer:
             logging.info("Evaluating the model")
             y_train_pred=model.predict(x_train)
             y_test_pred=model.predict(x_test)
-            train_f1=classification_metric(y_train,y_train_pred)
-            test_f1=classification_metric(y_test,y_test_pred)
-            logging.info(f"Train F1 Score: {train_f1}, Test F1 Score: {test_f1}")
-            self.log_mlflow(model,x_test,y_test,train_f1,test_f1)
-            if (test_f1<self.model_trainer_config.overfitting_threshold):
-                raise Exception(f"Model accuracy {test_f1} is below the expected threshold {self.model_trainer_config.overfitting_threshold}")
+            train_metrics=get_regression_score(y_train,y_train_pred)
+            test_metrics=get_regression_score(y_test,y_test_pred)
+            logging.info("Model metrics calculated")
+            self.log_mlflow(model,train_metrics,test_metrics)
+            if (test_metrics["r2_score"]<self.model_trainer_config.overfitting_threshold):
+                raise Exception(f"Model accuracy {test_metrics['r2_score']} is below the expected threshold {self.model_trainer_config.overfitting_threshold}")
             
-            final_model_path=os.path.join(self.model_trainer_config.model_save_dir,"final_model")
+            final_model_path=os.path.join(self.model_trainer_config.model_trainer_dir,"final_model")
             os.makedirs(final_model_path,exist_ok=True)
             model_file_path=os.path.join(final_model_path,"model.pkl")
             save_object(model_file_path,model)
@@ -101,12 +111,10 @@ class ModelTrainer:
             save_object(preprocessor_file_path,preprocessor)
             logging.info(f"Preprocessor saved at {preprocessor_file_path}")
 
-            save_object("final_model/feature_names.pkl",x_train.columns.tolist())
-            logging.info("Model Trainer completed successfully.")
-
             model_trainer_artifact=ModelTrainerArtifact(trained_model_file_path=model_file_path,
                                                         preprocessor_object_file_path=preprocessor_file_path,
-                                                        test_f1_score=test_f1)
+                                                        train_metrics=train_metrics,
+                                                        test_metrics=test_metrics)
             return model_trainer_artifact
         except Exception as e:
             raise LapTimeException(e,sys)
