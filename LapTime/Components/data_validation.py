@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+import sys
 from laptime.entity.config_entity import DataValidationConfig
 from laptime.entity.artifact_entity import DataIngestionArtifact,DataValidationArtifact
 from laptime.exception.exception import LapTimeException   
@@ -42,20 +43,30 @@ class DataValidation:
         try:
             status=True
             report={}
-            for column in base_df.columns:
-                d1=base_df[column]
-                d2=current_df[column]
+            numeric_columns=base_df.select_dtypes(include=[np.number]).columns
+            for column in numeric_columns:
+                d1=base_df[column].dropna()
+                d2=current_df[column].dropna()
+
+                if len(d1)==0 or len(d2)==0:
+                    continue
+
+                sample_size=min(10000,len(d1),len(d2))
+                d1=d1.sample(sample_size,random_state=42)
+                d2=d2.sample(sample_size,random_state=42)
+
                 is_same_dist=ks_2samp(d1,d2)
                 if threshold<=is_same_dist.pvalue:
                     is_found=False
                 else:                    
                     is_found=True
                     status=False
-            report.update({column:{"p_value":float(is_same_dist.pvalue),"drift_status":is_found}})
+                report.update({column:{"p_value":float(is_same_dist.pvalue),"drift_status":is_found}})
             drift_report_file_path=self.data_validation_config.drift_report_file_path
             dir_path=os.path.dirname(drift_report_file_path)
             os.makedirs(dir_path,exist_ok=True)
             write_yaml_file(file_path=drift_report_file_path,content=report)
+            return status
         except Exception as e:
                 raise LapTimeException(e,sys)
         
@@ -71,17 +82,17 @@ class DataValidation:
             logging.info("Validating number of columns in training dataset")
             status=self.validate_number_of_columns(train_dataframe)
             if not status:
-                raise LapTimeException(f"Number of columns in training dataset does not match with schema")
+                raise LapTimeException(f"Number of columns in training dataset does not match with schema",sys)
             status=self.validate_number_of_columns(test_dataframe)
             if not status:
-                raise LapTimeException(f"Number of columns in test dataset does not match with schema")
+                raise LapTimeException(f"Number of columns in test dataset does not match with schema",sys)
             logging.info("Detecting dataset drift")
 
             status=self.detect_dataset_drift(base_df=train_dataframe,current_df=test_dataframe)
-            dir_path-=os.path.dirname(self.data_validation_config.drift_report_file_path)
+            dir_path=os.path.dirname(self.data_validation_config.drift_report_file_path)
             os.makedirs(dir_path,exist_ok=True)
-            os.makedirs(os.path.dirname(self.data_validation_config.validated_train_file_path),exist_ok=True)
-            os.makedirs(os.path.dirname(self.data_validation_config.validated_test_file_path),exist_ok=True)
+            os.makedirs(os.path.dirname(self.data_validation_config.valid_train_file_path),exist_ok=True)
+            os.makedirs(os.path.dirname(self.data_validation_config.valid_test_file_path),exist_ok=True)
 
             train_dataframe.to_csv(self.data_validation_config.valid_train_file_path,index=False)
             test_dataframe.to_csv(self.data_validation_config.valid_test_file_path,index=False)
@@ -90,7 +101,9 @@ class DataValidation:
                 validation_status=status,
                 valid_train_file_path=self.data_validation_config.valid_train_file_path,
                 valid_test_file_path=self.data_validation_config.valid_test_file_path,
-                drift_report_file_path=self.data_validation_config.drift_report_file_path
+                drift_report_file_path=self.data_validation_config.drift_report_file_path,
+                invalid_train_file_path=None,
+                invalid_test_file_path=None
             )
             return datavalidationartifact
         except Exception as e:

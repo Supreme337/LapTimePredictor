@@ -29,7 +29,7 @@ class DataIngestion:
             collection=self.mongo_client[database_name][collection_name]
             metadata=collection.find_one({"dataset_name":"f1_tire_strategy_dataset"})
             file_path=metadata["file_path"]
-            df=pd.DataFrame(file_path)
+            df=pd.read_csv(file_path)
             if df.empty:
                 raise ValueError(f"The MongoDB collection '{collection_name}' in database '{database_name}' is empty.")
             if "_id" in df.columns.to_list():

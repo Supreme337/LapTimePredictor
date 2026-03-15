@@ -8,7 +8,7 @@ ARTIFACT_DIR:str="Artifacts"
 FILE_NAME:str="processed_f1_tire_strategy_dataset.csv"
 PIPELINE_NAME:str="LapTime"
 
-SCHEMA_FILE_PATH=os.path.join("data_schema","schema.yaml")
+SCHEMA_FILE_PATH=os.path.join("data_schema","raw_schema.yaml")
 
 TRAIN_FILE_NAME:str="train.csv"
 TEST_FILE_NAME:str="test.csv"
@@ -20,7 +20,7 @@ PREPROCESSING_OBJECT_FILE_NAME:str="preprocessing.pkl"
 SAVED_MODEL_DIR:str="final_models"
 
 COLUMNS_TO_DROP=['lap','milliseconds','driverId_y','year','round','name_y','name_x','Driver','LapTime','location','alt'
-                 ,'TrackName','race_Id','RaceProgress','Compound_UNKNOWN']
+                 ,'TrackName','raceId','RaceProgress','Compound_UNKNOWN']
 TIRE_TYPE_COLUMNS=['Compound_SOFT','Compound_MEDIUM','Compound_HARD','Compound_INTERMEDIATE','Compound_WET']
 NA_COLUMNS=[('TireAge','Stint')]
 

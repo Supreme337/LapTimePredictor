@@ -43,10 +43,10 @@ class DataTransformation:
             train_df=self.feature_engineering(train_df)
             test_df=self.feature_engineering(test_df)
 
-            x_train=train_df.drop(columns=[TARGET_COLUMN]+COLUMNS_TO_DROP)
+            x_train=train_df.drop(columns=[TARGET_COLUMN]+COLUMNS_TO_DROP,axis=1)
             y_train=train_df[TARGET_COLUMN]
 
-            x_test=test_df.drop(columns=[TARGET_COLUMN]+COLUMNS_TO_DROP)
+            x_test=test_df.drop(columns=[TARGET_COLUMN]+COLUMNS_TO_DROP,axis=1)
             y_test=test_df[TARGET_COLUMN]
 
             bool_cols=x_train.select_dtypes(include=['bool']).columns

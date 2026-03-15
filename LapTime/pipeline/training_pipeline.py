@@ -4,7 +4,7 @@ from laptime.components.data_transformation import DataTransformation
 from laptime.components.data_validation import DataValidation
 from laptime.components.model_trainer import ModelTrainer
 from laptime.components.data_ingestion import DataIngestion
-from laptime.exception.exception import LaptimeException
+from laptime.exception.exception import LapTimeException
 from laptime.logging.logger import logging
 from laptime.components import(
     DataIngestion,
@@ -39,7 +39,7 @@ class TrainingPipeline:
             logging.info(f"Data Ingestion Completed and artifact:{data_ingestion_artifact}")
             return data_ingestion_artifact
         except Exception as e:
-            raise LaptimeException(e,sys)
+            raise LapTimeException(e,sys)
         
     def start_data_validation(self,data_ingestion_artifact:DataIngestionArtifact)->DataValidationArtifact:
         try:
@@ -49,7 +49,7 @@ class TrainingPipeline:
             data_validation_artifact=data_validation.initiate_data_validation()
             return data_validation_artifact
         except Exception as e:
-            raise LaptimeException(e,sys)
+            raise LapTimeException(e,sys)
 
     def start_data_transformation(self,data_validation_artifact:DataValidationArtifact)->DataTransformationArtifact:
         try:
@@ -58,7 +58,7 @@ class TrainingPipeline:
             data_transformation_artifact=data_transformation.initiate_data_transformation()
             return data_transformation_artifact
         except Exception as e:
-            raise LaptimeException(e,sys)
+            raise LapTimeException(e,sys)
     
     def start_model_trainer(self,data_transformation_artifact:DataTransformationArtifact)->ModelTrainerArtifact:
         try:
@@ -67,7 +67,7 @@ class TrainingPipeline:
             model_trainer_artifact=model_trainer.initiate_model_trainer()
             return model_trainer_artifact
         except Exception as e:
-            raise LaptimeException(e,sys)
+            raise LapTimeException(e,sys)
         
     def run_pipeline(self):
         try:
@@ -77,4 +77,4 @@ class TrainingPipeline:
             model_trainer_artifact=self.start_model_trainer(data_transformation_artifact=data_transformation_artifact)
             return model_trainer_artifact
         except Exception as e:
-            raise LaptimeException(e,sys)
+            raise LapTimeException(e,sys)
