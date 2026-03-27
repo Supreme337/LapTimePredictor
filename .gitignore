@@ -1,0 +1,16 @@
+cache/
+*.sqlite
+venv/
+__pycache__/
+.env
+F1_datasets/*.csv
+xgb_importance.png
+.vscode/
+dataset/f1_schedule_2020-2025.csv
+dataset/f1_tire_strategy_dataset.csv
+Artifacts
+logs
+yearly_data/*.csv
+push_to_mongodb.py
+test.ipynb
+dataset/processed_f1_tire_strategy_dataset.csv

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>F1 Lap Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+                filter: blur(8px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+    .animate-fadeIn {
+        animation: fadeIn 1.5s ease-out forwards;}
+    html{scroll-behavior: smooth;}
+</style>
+</head>
+<body class="bg-[#0B0D12] text-white">
+<section class="min-h-screen flex items-center px-16 bg-gradient-to-r from-[#0B0D12] to-[#111827]">
+    <div class="w-1/2 space-y-6">
+        <p class="text-red-600 text-sm tracking-widest font-semibold uppercase animate-fadeIn"
+       style="font-family: 'Orbitron', sans-serif;">
+        Lap Time Predictor
+        </p>
+        <h1 class="text-6xl font-bold leading-tight animate-fadeIn">
+            Predict <br>
+            F1 Lap Times <br>
+            with Precision.
+        </h1>
+        <p class="text-gray-400 text-lg max-w-md opacity-0 animate-fadeIn" style="animation-delay: 0.5s;">
+            Simulate race scenarios, tyre strategies, and driver performance 
+            using machine learning models trained on real F1 data.
+        </p>
+        <a href="#predict"
+           class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 px-6 py-3 rounded-full font-semibold opacity-0 animate-fadeIn"
+            style="animation-delay: 1s;">
+            Start Predicting →
+        </a>
+    </div>
+    <div class="w-1/2 flex justify-center">
+        <div class="animate-fadeIn" style="animation-delay:0s;">
+            <div class="relative">
+                <div class="absolute inset-0 bg-red-800 blur-3xl opacity-20 rounded-2xl"></div>
+                <img src="{{ url_for('static', filename='images/f1_visual2.png') }}" 
+                    class="relative w-[800px] rounded-2xl shadow-2xl hover:scale-105 transition duration-500">
+            </div>
+        </div>
+    </div>
+    <div class="text-gray-400 px-2 font-semibold py-2 px-5 fixed bottom-4 right-4">
+        Created By - Harsh Malik
+    </div>
+</section>
+<section id="predict" class="min-h-screen flex items-center justify-center bg-[#0B0D12] px-6">
+    <div class="bg-[#111827] rounded-3xl p-10 w-full max-w-5xl shadow-2xl flex gap-10">
+        <form method="POST" action="#predict" class="w-1/2 space-y-4">
+            <p class="text-red-600 text-xs tracking-[0.3em] uppercase opacity-70"
+               style="font-family: 'Orbitron', sans-serif;">
+                Race Inputs
+            </p>
+            <h2 class="text-3xl font-bold">
+                Configure Prediction
+            </h2>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="number" name="stint" value="{{ form_data.stint if form_data else ''}}" placeholder="Stint"
+                    class="bg-[#0B0D12] p-3 rounded-lg outline-none border border-gray-800 focus:border-red-500 transition">
+                <input type="number" name="year" value="{{ form_data.year if form_data else '' }}" placeholder="Year"
+                    class="bg-[#0B0D12] p-3 rounded-lg outline-none border border-gray-800 focus:border-red-500 transition">
+                <input type="number" name="round" value="{{ form_data.round if form_data else '' }}" placeholder="Round"
+                    class="bg-[#0B0D12] p-3 rounded-lg outline-none border border-gray-800 focus:border-red-500 transition">
+                <input type="number" name="tire_age" value="{{ form_data.tire_age if form_data else '' }}" placeholder="Tire Age"
+                    class="bg-[#0B0D12] p-3 rounded-lg outline-none border border-gray-800 focus:border-red-500 transition">
+                <input type="number" name="grid" value="{{ form_data.grid if form_data else '' }}" placeholder="Grid Position"
+                    class="bg-[#0B0D12] p-3 rounded-lg outline-none border border-gray-800 focus:border-red-500 transition">
+                <input type="number" name="stintlap" value="{{ form_data.stintlap if form_data else '' }}" placeholder="Stint Lap"
+                    class="bg-[#0B0D12] p-3 rounded-lg outline-none border border-gray-800 focus:border-red-500 transition">
+                <input type="number" name="lappct" value="{{ form_data.lappct if form_data else '' }}" placeholder="Lap Percentage"
+                    class="bg-[#0B0D12] p-3 rounded-lg outline-none border border-gray-800 focus:border-red-500 transition">
+                <div class="space-y-1">
+                    <label class="text-gray-400 text-sm">Circuit</label>
+                    <select name="circuit" 
+                        class="w-full bg-[#0B0D12] p-3 rounded-lg border border-gray-800 focus:border-red-500">
+                        {% for id, name in circuits.items() %}
+                            <option value="{{ id }}"
+                            {% if form_data and form_data.circuit == id|string %}selected{% endif %}>
+                                {{ name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-gray-400 text-sm">Driver</label>
+                    <select name="Driver" class="w-full bg-[#0B0D12] p-3 rounded-lg border border-gray-800 focus:border-red-500">
+                        {% for driver in drivers %}
+                            <option value="{{ driver }}"
+                            {% if form_data and form_data.Driver == driver %}selected{% endif %}>
+                                {{ driver }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="space-y-1">
+            <label class="text-gray-400 text-sm">Tire type</label>
+            <select name="tyre" class="w-full bg-[#0B0D12] p-3 rounded-lg">
+                {% for t in ["Soft","Medium","Hard","Intermediate","Wet"] %}
+                    <option value="{{ t }}"
+                    {% if form_data and form_data.tyre == t %}selected{% endif %}>
+                        {{ t }}
+                    </option>
+                {% endfor %}
+            </select></div>
+            <div class="space-y-1">
+            <label class="text-gray-400 text-sm">Pit Lap</label>
+            <select name="pitlap" class="w-full bg-[#0B0D12] p-3 rounded-lg border border-gray-800">
+                <option value="1" {% if form_data and form_data.pitlap == "1" %}selected{% endif %}>Yes</option>
+                <option value="0" {% if form_data and form_data.pitlap == "0" %}selected{% endif %}>No</option>
+            </select>
+        </div>
+        <div class="space-y-1">
+            <label class="text-gray-400 text-sm">Pit Out</label>
+            <select name="pitout" class="w-full bg-[#0B0D12] p-3 rounded-lg border border-gray-800">
+                <option value="1" {% if form_data and form_data.pitout == "1" %}selected{% endif %}>Yes</option>
+                <option value="0" {% if form_data and form_data.pitout == "0" %}selected{% endif %}>No</option>
+            </select>
+        </div>
+            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 p-3 rounded-full font-semibold transition">
+                Predict Lap Time →
+            </button>
+            <button type="submit" formaction="/stats" formmethod="POST"
+                class="w-full bg-gray-800 hover:bg-gray-700 p-3 rounded-full font-semibold transition mt-2">
+                Show Statistics 
+            </button>
+        </form>
+        <div class="w-1/2 flex items-center justify-center">
+    <div class="w-full max-w-sm text-center">
+        <div class="mt-7 space-y-2 mb-2">
+            <div class="border border-red-600 rounded-2xl p-8 shadow-lg bg-[#0B0D12] transition-all duration-500">
+                <p class="text-gray-400 text-sm mb-2">
+                    Best Tire
+                </p>
+                <h2 class="text-5xl font-bold text-red-500">
+                    {{ best_tire }}
+                </h2>
+            </div>
+            <div class="border border-red-600 rounded-2xl p-8 shadow-lg bg-[#0B0D12] transition-all duration-500 ">
+                <p class="text-gray-400 text-sm mb-2">
+                    Best Pit Lap
+                </p>
+                <h2 class="text-5xl font-bold text-red-500">
+                    {{ pit_lap }}
+                </h2>
+            </div>
+        </div>
+        {% if lap_time %}
+            <div class="border border-red-600 rounded-2xl p-8 shadow-lg bg-[#0B0D12] transition-all duration-500">
+                <p class="text-gray-400 text-sm mb-2">
+                    Predicted Lap Time
+                </p>
+                <h2 class="text-5xl font-bold text-red-500">
+                    {{ lap_time }} s
+                </h2>
+            </div>
+        {% else %}
+            <div class="border border-gray-800 rounded-2xl p-8 bg-[#0B0D12] text-gray-400">
+                Select inputs to simulate race conditions
+            </div>
+        {% endif %}
+    </div>
+</div>
+    </div>
+</section>
+<script>
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration='manual';}
+    window.onload=function () {
+        window.scrollTo(0,0);};
+</script>
+</body>
+</html>

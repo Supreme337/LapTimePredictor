@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+</head>
+<body class="bg-[#0B0D12] text-white min-h-screen p-10">
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-red-500">Race Analytics</h1>
+        <p class="text-gray-400 mt-2">Performance Insights</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-6xl mx-auto">
+        <div class="bg-[#111827] p-6 rounded-2xl border border-gray-800">
+            <h2 class="text-lg mb-4 text-gray-300">Lap Time Comparison</h2>
+            <canvas id="lapChart"></canvas>
+        </div>
+        <div class="bg-[#111827] p-6 rounded-2xl border border-gray-800">
+            <h2 class="text-lg mb-4 text-gray-300">Tire Performance</h2>
+            <canvas id="tireChart"></canvas>
+        </div>
+        <div class="bg-[#111827] p-6 rounded-2xl border border-gray-800 md:col-span-2">
+            <h2 class="text-lg mb-4 text-gray-300">Tire Degradation</h2>
+            <canvas id="degChart"></canvas>
+        </div>
+    </div>
+    <div class="mt-7">
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-[#111827] p-4 rounded-xl">
+                <p class="text-gray-400 text-sm">Predicted</p>
+                <p class="text-xl font-bold">{{ prediction }}s</p>
+            </div>
+            <div class="bg-[#111827] p-4 rounded-xl">
+                <p class="text-gray-400 text-sm">Driver Avg</p>
+                <p class="text-xl font-bold">{{ driver_avg }}s</p>
+            </div>
+            <div class="bg-[#111827] p-4 rounded-xl">
+                <p class="text-gray-400 text-sm">Circuit Avg</p>
+                <p class="text-xl font-bold">{{ circuit_avg }}s</p>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-10">
+        <a href="/" class="bg-gray-800 hover:bg-gray-700 px-6 py-3 rounded-full">
+            ← Back
+        </a>
+    </div>
+    <script>
+    const ctx = document.getElementById('lapChart');
+    Chart.register(ChartDataLabels);
+    new Chart(tireCtx, {
+        type: 'line',
+        data: {
+            labels: {{ tire_labels | tojson }},
+            datasets: [{
+                label: 'Avg Lap Time',
+                data: {{ tire_values | tojson }},
+                fill: false,
+                tension: 0.3
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'white'
+                    }
+                },
+                datalabels: {
+                    color: "#4FC3F7",
+                    align: "top",
+                    formatter: (value) => value.toFixed(2) + " s"
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return "Avg: " + context.raw.toFixed(2) + " s";
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: 'white' }
+                },
+                y: {
+                    ticks: { color: 'white' }
+                }
+            }
+        }
+    });
+    </script>
+    <script>
+Chart.register(ChartDataLabels);
+
+const lapCtx = document.getElementById('lapChart');
+
+new Chart(lapCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Predicted', 'Driver Avg', 'Circuit Avg'],
+        datasets: [{
+            label: 'Lap Time (s)',
+            data: [{{ prediction }}, {{ driver_avg }}, {{ circuit_avg }}],
+            backgroundColor: ['#ef4444', '#3b82f6', '#10b981'],
+            borderRadius: 12,          
+            borderSkipped: false,    
+            barThickness: 50
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                labels: { color: "white" }
+            },
+            datalabels: {
+                color: "white",
+                anchor: "end",
+                align: "top",
+                formatter: (value) => value.toFixed(2) + " s"
+            },
+            tooltip: {
+                callbacks: {
+                    label: (context) => context.raw.toFixed(2) + " s"
+                }
+            }
+        },
+        scales: {
+            x: { ticks: { color: 'white' } },
+            y: { ticks: { color: 'white' } }
+        }
+    }
+});
+
+
+const tireCtx = document.getElementById('tireChart');
+
+new Chart(tireCtx, {
+    type: 'line',
+    data: {
+        labels: {{ tire_labels | tojson }},
+        datasets: [{
+            label: 'Avg Lap Time',
+            data: {{ tire_values | tojson }},
+            borderColor: '#4FC3F7',
+            pointBackgroundColor: '#4FC3F7',
+            fill: false,
+            tension: 0.3
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                labels: { color: 'white' }
+            },
+            datalabels: {
+                color: "#4FC3F7",
+                align: "top",
+                formatter: (value) => value.toFixed(2) + " s"
+            },
+            tooltip: {
+                callbacks: {
+                    label: (context) => "Avg: " + context.raw.toFixed(2) + " s"
+                }
+            }
+        },
+        scales: {
+            x: { ticks: { color: 'white' } },
+            y: { ticks: { color: 'white' } }
+        }
+    }
+});
+const degCtx = document.getElementById('degChart');
+const degData = {{ deg_data | tojson }};
+const datasets = Object.keys(degData).map((compound, i) => ({
+    label: compound,
+    data: degData[compound].x.map((x, idx) => ({
+        x: x,
+        y: degData[compound].y[idx]
+    })),
+    borderWidth: 2,
+    tension: 0.3,
+    pointRadius: 3
+}));
+
+new Chart(degCtx, {
+    type: 'line',
+    data: {
+        datasets: datasets
+    },
+    options: {
+        parsing: false,
+        plugins: {
+            legend: {
+                labels: { color: 'white' }
+            },
+            datalabels:{display:false},
+            tooltip: {
+                callbacks: {
+                    label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.y.toFixed(2)}s`
+                }
+            }
+        },
+        scales: {
+            x: {
+                type: 'linear',
+                title: {
+                    display: true,
+                    text: 'Tire Age (laps)',
+                    color: 'white'
+                },
+                ticks: { color: 'white' }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Lap Time (s)',
+                    color: 'white'
+                },
+                ticks: { color: 'white' }
+            }
+        }
+    }
+});
+</script>
+
+</body>
+</html>
