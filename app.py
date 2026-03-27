@@ -72,8 +72,7 @@ def home():
         tire_stats=df_full.groupby("Compound")["LapTimeSeconds"].mean()
         best_tire=tire_stats.idxmin()
 
-        driver_df=df_full[df_full["Driver"]==driver &
-                          df_full["circuitId"]==circuit]
+        driver_df=df_full[df_full["Driver"]==driver]
         deg=driver_df.groupby("TireAge")["LapTimeSeconds"].mean().reset_index()
         deg["delta"]=deg["LapTimeSeconds"].diff()
         pit_lap=int(deg.loc[deg["delta"].idxmax(),"TireAge"])
