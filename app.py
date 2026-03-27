@@ -78,10 +78,8 @@ def home():
         deg["delta"]=deg["LapTimeSeconds"].diff()
         pit_lap=int(deg.loc[deg["delta"].idxmax(),"TireAge"])
 
-        string="Predict to find out"
-
         return render_template("index.html",lap_time=round(prediction,3),circuits=circuit_dict,drivers=driver_categories,form_data=form,best_tire=best_tire,pit_lap=pit_lap)
-    return render_template("index.html",lap_time=None,circuits=circuit_dict,drivers=driver_categories,best_tire=string,pit_lap=string)
+    return render_template("index.html",lap_time=None,circuits=circuit_dict,drivers=driver_categories,best_tire=None,pit_lap=None)
 
 @app.route("/stats",methods=['POST'])
 def stats():
